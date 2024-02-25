@@ -9,7 +9,7 @@ use rusty_tesseract::tesseract::output_boxes::{image_to_boxes,};
 use rusty_tesseract::{Args, TessError};
 
 use image::Rgba as ImageRgba;
-use rusty_tesseract::image::Rgba as TessRgba; 
+use rusty_tesseract::image::Rgba as TessRgba;
 
 fn convert_rgba(image_rgba: ImageRgba<u8>) -> TessRgba<u8> {
     TessRgba([image_rgba.0[0], image_rgba.0[1], image_rgba.0[2], image_rgba.0[3]])
@@ -76,7 +76,8 @@ struct ScreenShot {
     pub frame: Bitmap,
     pub image: Option<RgbaImage>,
     pub position: Rect,
-    pub items: Vec<Item>
+    pub items: Vec<Item>,
+    pub selected: Vec<String>,
 }
 impl ScreenShot {
     fn get_window_position(output: &str) -> Result<Rect, Error> {
@@ -155,6 +156,7 @@ impl ScreenShot {
                 image: None,
                 position: rect,
                 items: Vec::new(),
+                selected: Vec::new(),
             }
         )
     }
@@ -190,12 +192,12 @@ impl ScreenShot {
             (a.center <= b.top && a.center >= b.bottom)
     }
 
-    fn chars_to_words(chars: Vec<Char>) -> Vec<Item> {
+    fn chars_to_words(chars: Vec<Char>, factor: i32) -> Vec<Item> {
         let mut words: Vec<Item> = Vec::new();
         let mut current_word_chars: Vec<Char> = Vec::new();
 
         for char in chars {
-            if current_word_chars.is_empty() || current_word_chars.last().unwrap().intersect(&char, 1) {
+            if current_word_chars.is_empty() || current_word_chars.last().unwrap().intersect(&char, factor) {
                 current_word_chars.push(char);
             } else {
                 words.push(Self::chars_to_item(current_word_chars));
@@ -216,6 +218,7 @@ impl ScreenShot {
         let mut right = i32::MIN;
         let mut top = i32::MIN;
         let mut bottom = i32::MAX;
+        let offset = 6.0f64;
 
         for char in chars {
             text.push_str(&char.text);
@@ -228,8 +231,8 @@ impl ScreenShot {
         Item {
             text,
             position: Rect::new(
-                Point::new(left as f64, bottom as f64),
-                Size::new((right - left) as f64, (top - bottom) as f64)
+                Point::new((left as f64) - offset, (bottom as f64) - offset),
+                Size::new(((right - left) as f64) + 2.0 * offset, ((top - bottom) as f64) + 2.0 * offset)
             ),
             kind: None,
         }
@@ -243,34 +246,44 @@ impl ScreenShot {
 
     pub fn append_item(&mut self, mut item: Item) {
         // Adjust item's position by adding the offset of the screenshot
-        item.position.origin.x += self.position.origin.x;
-        item.position.origin.y += self.position.origin.y;
+        // item.position.origin.x = self.position.origin.x - item.position.origin.x;
+        // item.position.origin.y = -(self.position.origin.y - item.position.origin.y);
+        // item.position.size.height = - item.position.size.height;
 
         // Append the adjusted item to the items vector
         self.items.push(item);
     }
 
-    fn draw_item_box(&mut self, rect: &Rect, border_thickness: i32, color: Rgba<u8>) {
-        if let Some(img) = &mut self.image {
-            // Adjust rectangle coordinates to be relative to the frame
-            let adjusted_x = rect.origin.x as i32 - self.position.origin.x as i32;
-            let adjusted_y = (self.frame.size.height as i32 - rect.origin.y as i32) - self.position.origin.y as i32 + rect.size.height as i32;
-
-
-            for x in (adjusted_x - border_thickness)..(adjusted_x + rect.size.width as i32 + border_thickness) {
-                for y in (adjusted_y - border_thickness)..(adjusted_y + rect.size.height as i32 + border_thickness) {
-                    if x >= adjusted_x && x < adjusted_x + rect.size.width as i32 &&
-                        (y < adjusted_y + border_thickness || y >= adjusted_y + rect.size.height as i32 - border_thickness) ||
-                        y >= adjusted_y && y < adjusted_y + rect.size.height as i32 &&
-                            (x < adjusted_x + border_thickness || x >= adjusted_x + rect.size.width as i32 - border_thickness) {
-                        // Check bounds to prevent out-of-bounds drawing
-                        if x >= 0 && y >= 0 && x < img.width() as i32 && y < img.height() as i32 {
-                            img.put_pixel(x as u32, y as u32, color);
-                        }
-                    }
-                }
+    fn draw_rectangle(img: &mut RgbaImage, mut xa: u32, mut xb: u32, mut ya: u32, mut yb: u32, color: Rgba<u8>) {
+        if yb < ya {
+            (ya, yb) = (yb, ya);
+        }
+        if xb < xa {
+            (xa, xb) = (xb, xa);
+        }
+        for x in xa..xb {
+            for y in ya..yb {
+                img.put_pixel(x, y, color);
             }
         }
+    }
+
+    fn draw_item_box(&mut self, rect: &Rect, b: u32, color: Rgba<u8>) {
+        let h = self.position.size.height as u32;
+        if let Some(img) = &mut self.image {
+            let xa: u32 = rect.origin.x as u32;
+            let xb: u32 = (rect.origin.x + rect.size.width) as u32;
+            let ya: u32 = h - (rect.origin.y as u32);
+            let yb: u32 = h - ((rect.origin.y + rect.size.height) as u32);
+
+            Self::draw_rectangle(img, xa - b, xb + b, ya - b, ya, color );
+            Self::draw_rectangle(img, xa - b, xb + b, yb, yb + b, color );
+            Self::draw_rectangle(img, xa - b, xa, ya, yb, color );
+            Self::draw_rectangle(img, xb, xb + b, ya, yb, color );
+
+
+        }
+
     }
 
     fn process(&mut self) -> Result<(), Error> {
@@ -328,15 +341,16 @@ impl ScreenShot {
 
         // Separate in items
         for line in lines{
-            self.append_items(Self::chars_to_words(line));
+            self.append_items(Self::chars_to_words(line, 1));
         }
 
         self.image = Some(Self::bitmap_to_image_buffer(&self.frame)?);
         // Draw boundary box of each item
         for item in self.items.clone() {
-            self.draw_item_box(&item.position, 5, Rgba([255, 0, 0, 255]));
+            println!("{}", &item.text);
+            self.draw_item_box(&item.position, 4, Rgba([255, 0, 0, 255]));
         }
-        
+
         // Save into a file
         if let Some(image) = self.image.take() {
             image.save("output.png").map_err(|e| Error::FailCapture(e.to_string()))?;
@@ -344,18 +358,18 @@ impl ScreenShot {
 
         Ok(())
     }
+
+    fn select(mut self, s: &str) -> Self{
+        self.selected.push(s.to_string());
+        self
+    }
 }
 
 
 fn main() -> Result<(), Error> {
-    let mut frame = ScreenShot::from_named_window("Liana")?;
+    let mut frame = ScreenShot::from_named_window("Liana")?
+        .select("Addpayment");
     frame.process()?;
-    // println!("------------------------");
-    // println!("{:?}", frame);
-    // println!("------------------------");
-    // for word in frame.items {
-    //     println!("{:?}", word)
-    // }
 
 
     Ok(())

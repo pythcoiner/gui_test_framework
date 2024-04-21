@@ -16,6 +16,9 @@ bool Args::parse(int argc, char *argv[]) {
     app.add_option("-d,--dilate", this->dilate_factor, "Dilate factor.")
             ->default_val(15);
 
+    app.add_flag("--debug", this->debug, "Debug mode: will display mask for each `color` and "
+                                            "selected labels on the screenshot. ");
+
     std::string json_colors;
     app.add_option("-c,--colors", json_colors, "A JSON list of RGB colors")->required();
 

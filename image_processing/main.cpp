@@ -10,7 +10,9 @@ cv::Mat detect_color(const cv::Mat& frame, const cv::Scalar& color, uint8_t rang
 cv::Scalar rgb_to_bgr(const cv::Scalar& color);
 cv::Scalar bgr_to_rgb(const cv::Scalar & color);
 std::vector<cv::Rect> find_items(cv::Mat* mask);
-void process(Response* response, const cv::Mat& frame, const cv::Scalar&  bgr_color, uint8_t range, int dilate_factor);
+void process(Response* response, const cv::Mat& frame, const cv::Scalar&  bgr_color, uint8_t range, int dilate_factor, bool debug);
+std::vector<cv::Rect> find_items(cv::Mat* mask, bool debug);
+
 
 //const cv::Scalar NEXT = cv::Scalar(254, 167, 0);
 //const cv::Scalar CLEAR = cv::Scalar(226, 78, 27);
@@ -42,10 +44,12 @@ int main(int argc, char* argv[]) {
 
     // detect all items in img
     for (const auto& color: args.colors) {
-        process(&response, img, color, args.range, args.dilate_factor);
+        process(&response, img, color, args.range, args.dilate_factor, args.debug);
     }
 
-    std::cout << response.items.size() << " items detected!" << std::endl;
+    if (args.debug) {
+        std::cout << response.items.size() << " items detected!" << std::endl;
+    }
 
     std::cout << response.to_json() << std::endl;
 
@@ -54,14 +58,16 @@ int main(int argc, char* argv[]) {
         cv::rectangle(img, item.bounding_rect, item.color, 2);
     }
 
-    // Display the result
-    cv::imshow("Detected Rectangles", img);
-    cv::waitKey(0);
+    if (args.debug) {
+        // Display the result
+        cv::imshow("Colored labels detected", img);
+        cv::waitKey(0);
+    }
 
     return 0;
 }
 
-void process(Response* response, const cv::Mat& frame, const cv::Scalar&  bgr_color, uint8_t range, int dilate_factor) {
+void process(Response* response, const cv::Mat& frame, const cv::Scalar&  bgr_color, uint8_t range, int dilate_factor, bool debug) {
 
     cv::Mat mask = detect_color(frame, rgb_to_bgr(bgr_color), range);
 
@@ -74,10 +80,12 @@ void process(Response* response, const cv::Mat& frame, const cv::Scalar&  bgr_co
     // offset 5 pixels
     dilate(&mask, 5);
 
+    if (debug) {
         cv::imshow("Mask", mask);
         cv::waitKey(0);
+    }
 
-    std::vector<cv::Rect> items = find_items(&mask);
+    std::vector<cv::Rect> items = find_items(&mask, debug);
 
     for (auto i: items) {
         response->push(Item(bgr_to_rgb(bgr_color), i));
@@ -117,6 +125,10 @@ cv::Scalar bgr_to_rgb(const cv::Scalar & color) {
 }
 
 std::vector<cv::Rect> find_items(cv::Mat* mask) {
+    return find_items(mask, false);
+}
+
+std::vector<cv::Rect> find_items(cv::Mat* mask, bool debug) {
     // Find contours
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(*mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
@@ -132,7 +144,9 @@ std::vector<cv::Rect> find_items(cv::Mat* mask) {
         items[i] = cv::boundingRect(contours_poly);
     }
 
-    std::cout << "Found " << items.size() << " items!" << std::endl;
+    if (debug) {
+        std::cout << "Found " << items.size() << " items!" << std::endl;
+    }
 
     return  items;
 }

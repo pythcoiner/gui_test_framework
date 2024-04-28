@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <opencv2/opencv.hpp>
-#include <nlohmann/json.hpp>
+#include <json.hpp>
 
 struct Args {
     std::string filename;

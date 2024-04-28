@@ -3,19 +3,6 @@ project(image_processing)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Include FetchContent module for downloading dependencies
-include(FetchContent)
-
-# Declare the nlohmann_json library from its GitHub repository
-FetchContent_Declare(
-        json
-        GIT_REPOSITORY https://github.com/nlohmann/json.git
-        GIT_TAG v3.10.5  # Use a specific release tag
-)
-
-# Make the nlohmann_json library available
-FetchContent_MakeAvailable(json)
-
 # Find OpenCV package
 find_package(OpenCV REQUIRED)
 
@@ -28,6 +15,7 @@ add_executable(image_processing main.cpp
         include/item.h
         src/item.cpp
         include/CLI11.hpp
+        include/json.hpp
         include/args.h
         src/args.cpp)
 
@@ -40,5 +28,4 @@ target_include_directories(image_processing PRIVATE
 # Link libraries with the executable
 target_link_libraries(image_processing
         ${OpenCV_LIBS}
-        nlohmann_json::nlohmann_json
 )

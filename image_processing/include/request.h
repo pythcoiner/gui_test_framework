@@ -1,7 +1,7 @@
 #pragma once
 
 #include <opencv2/core.hpp>
-#include <nlohmann/json.hpp>
+#include <json.hpp>
 #include <vector>
 #include <string>
 #include <array>

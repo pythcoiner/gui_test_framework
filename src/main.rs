@@ -15,8 +15,6 @@ use items::*;
 use crate::capture::Capture;
 use crate::graphical::{CORAL, DARK_CYAN, HOT_PINK, LIME, MEDIUM_BLUE, ORANGE, PINK, PURPLE, RED};
 use crate::items::ItemKind::{CheckBox, MenuButton, PrimaryButton, SecondaryButton, SettingSection, TextInput};
-use crate::ocr::Ocr;
-
 
 #[derive(Debug)]
 #[allow(unused)]
@@ -27,6 +25,8 @@ struct ScreenShot {
     pub items: Vec<Item>,
     pub item_map: ItemMap,
 }
+
+#[allow(unused)]
 impl ScreenShot {
     pub fn append_items(&mut self, items: Vec<Item>) {
         for item in items {
@@ -62,14 +62,14 @@ impl ScreenShot {
 
     }
 
-    fn process(&mut self, map: ItemMap) -> Result<(), Error> {
-        self.frame.save("frame.png").map_err(|e| Error::FailCapture(e.to_string()))?;
-        for (color, kind) in map {
-            let frame = self.frame.filter_by_color(color);
-            let filename = format!("{:?}.png", color);
-            frame.save(filename).map_err(|e| Error::FailCapture(e.to_string()))?;
-            Ocr::img_to_items(frame, self, kind)?;
-        }
+    fn process(&mut self, _map: ItemMap) -> Result<(), Error> {
+        // self.frame.save("frame.png").map_err(|e| Error::FailCapture(e.to_string()))?;
+        // for (color, kind) in map {
+        //     let frame = self.frame.filter_by_color(color);
+        //     let filename = format!("{:?}.png", color);
+        //     frame.save(filename).map_err(|e| Error::FailCapture(e.to_string()))?;
+        //     Ocr::img_to_items(frame, self, kind)?;
+        // }
         
         // --------------------- Display items -----------------------
 
@@ -79,7 +79,7 @@ impl ScreenShot {
         //     println!("{}", &item.text);
         //     self.draw_item_box(&item.position, 4, Rgba([255, 0, 0, 255]));
         // }
-        // 
+        //
         // // Save into a file
         // if let Some(image) = self.image.take() {
         //     image.save("output.png").map_err(|e| Error::FailCapture(e.to_string()))?;
@@ -90,7 +90,7 @@ impl ScreenShot {
     
     pub fn print_items(&self) {
         for item in &self.items {
-            println!("{:?}", item);
+            println!("{} => {:?}", item.text.as_ref().unwrap(), item.kind);
         }
     }
 
@@ -101,10 +101,10 @@ fn main() -> Result<(), Error> {
     item_map.insert(LIME, TextInput);
     item_map.insert(RED, PrimaryButton(true));
     item_map.insert(ORANGE, PrimaryButton(false));
-    item_map.insert(PURPLE, SecondaryButton(false));
+    item_map.insert(PURPLE, SecondaryButton(true));
     item_map.insert(MEDIUM_BLUE, SecondaryButton(false));
     item_map.insert(HOT_PINK, MenuButton(false));
-    item_map.insert(PINK, MenuButton(false));
+    item_map.insert(PINK, MenuButton(true));
     item_map.insert(CORAL, CheckBox);
     item_map.insert(DARK_CYAN, SettingSection);
     

@@ -1,132 +1,49 @@
 use std::collections::HashMap;
-use autopilot::geometry::{Point, Rect, Size};
-use rusty_tesseract::{Args, image_to_boxes};
-use rusty_tesseract::image::{DynamicImage, RgbaImage};
+use rusty_tesseract::{Args, image_to_boxes, image_to_string};
+use rusty_tesseract::image::{DynamicImage, GenericImageView, RgbaImage};
 use rusty_tesseract::tesseract::input::Image as TessImage;
-use crate::error::Error;
-use crate::items::{Item, ItemKind};
-use crate::ScreenShot;
-
-#[derive(Debug, Clone)]
-struct Char {
-    text: String,
-    top: i32,
-    bottom: i32,
-    left: i32,
-    right: i32,
-    center: i32,
-}
-
-impl Char {
-    pub fn intersect(&self, other: &Self, f: i32) -> bool {
-
-        self.expanded(f).right >= other.expanded(f).left && other.expanded(f).right >= self.expanded(f).left
-    }
-
-    fn expanded(&self, factor: i32) -> Char {
-        let expanded_width = (self.right - self.left) /2 * factor;
-        let mut out = self.clone();
-        out.right += expanded_width;
-        out.left -= expanded_width;
-        out
-
-
-
-    }
-}
+use crate::widget_detector::Position;
 
 #[allow(unused)]
 pub struct Ocr{}
 
 impl Ocr {
-    fn chars_to_lines(mut chars: Vec<Char>) -> Vec<Vec<Char>> {
-        // Sort chars by their vertical center position
-        chars.sort_by(|a, b| a.center.partial_cmp(&b.center).unwrap());
+    pub fn read_label(frame: &RgbaImage, position: &Position) -> Option<String> {
+        // println!("Ocr::read_label() => Image {}x{}", frame.width(), frame.height());
+        // println!("Ocr::read_label() => Position [{}:{}, {}:{}]",
+        //          position.x,
+        //          position.y,
+        //          position.x + position.width,
+        //          position.y + position.height
+        //
+        // );
 
-        let mut lines: Vec<Vec<Char>> = Vec::new();
-        let mut current_line: Vec<Char> = Vec::new();
+        let cropped: RgbaImage = frame.view(
+            position.x,
+            position.y,
+            position.width,
+            position.height)
+            .to_image();
+        
+        // println!("image cropped");
+        
+        let dynamic_image = DynamicImage::ImageRgba8(cropped);
+        
+        // println!("Dynamic image");
 
-        for char in chars {
-            if current_line.is_empty() || Self::chars_are_on_same_line(current_line.last().unwrap(), &char) {
-                current_line.push(char);
-            } else {
-
-                current_line.sort_by(|a,b|(a.left+a.right).partial_cmp(&(b.left + b.right)).unwrap());
-                lines.push(current_line);
-                current_line = vec![char];
-            }
-        }
-
-        if !current_line.is_empty() {
-            lines.push(current_line);
-        }
-
-        lines
-    }
-
-    fn chars_are_on_same_line(a: &Char, b: &Char) -> bool {
-        // Check if the vertical center of one char is within the vertical range of the other
-        (b.center <= a.top  && b.center >= a.bottom) ||
-            (a.center <= b.top && a.center >= b.bottom)
-    }
-
-    fn line_to_items(chars: Vec<Char>, factor: i32, kind: Option<ItemKind>) -> Vec<Item> {
-        let mut words: Vec<Item> = Vec::new();
-        let mut current_word_chars: Vec<Char> = Vec::new();
-
-        for char in chars {
-            if current_word_chars.is_empty() || current_word_chars.last().unwrap().intersect(&char, factor) {
-                current_word_chars.push(char);
-            } else {
-                words.push(Self::chars_to_item(current_word_chars, kind.clone()));
-                current_word_chars = vec![char];
-            }
-        }
-
-        if !current_word_chars.is_empty() {
-            words.push(Self::chars_to_item(current_word_chars, kind));
-        }
-
-        words
-    }
-
-    fn chars_to_item(chars: Vec<Char>, kind: Option<ItemKind>) -> Item {
-        let mut text = String::new();
-        let mut left = i32::MAX;
-        let mut right = i32::MIN;
-        let mut top = i32::MIN;
-        let mut bottom = i32::MAX;
-        let offset = 6.0f64;
-
-        for char in chars {
-            text.push_str(&char.text);
-            left = left.min(char.left);
-            right = right.max(char.right);
-            top = top.max(char.top);
-            bottom = bottom.min(char.bottom);
-        }
-
-        Item {
-            text,
-            position: Rect::new(
-                Point::new((left as f64) - offset, (bottom as f64) - offset),
-                Size::new(((right - left) as f64) + 2.0 * offset, ((top - bottom) as f64) + 2.0 * offset)
-            ),
-            kind,
-        }
-    }
-
-    pub fn img_to_items(frame: RgbaImage, screenshot: &mut ScreenShot, kind: ItemKind) -> Result<(), Error> {
-
-        let dynamic_image = DynamicImage::ImageRgba8(frame);
-
-        let tess_image = TessImage::from_dynamic_image(&dynamic_image)?;
+        let tess_image = if let Ok(img) = TessImage::from_dynamic_image(&dynamic_image) {
+            img
+        } else {
+            return None
+        };
+        
+        // println!("Tess image");
 
         let args = Args {
             lang: "eng".into(),
             config_variables: HashMap::from([(
                 "tessedit_char_whitelist".into(),
-                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789".into(),
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.0123456789/()".into(),
             )]),
             // 15" screen 1920x1080 = 140DPI
             dpi: Some(140),
@@ -145,7 +62,7 @@ impl Ocr {
             // 11    Sparse text. Find as much text as possible in no particular order.
             // 12    Sparse text with OSD.
             // 13    Raw line. Treat the image as a single text line, bypassing hacks that are Tesseract-specific.
-            psm: Some(3),
+            psm: Some(13),
             // OCR Engine modes: (see https://github.com/tesseract-ocr/tesseract/wiki#linux)
             // 0    Legacy engine only.
             // 1    Neural nets LSTM engine only.
@@ -155,28 +72,13 @@ impl Ocr {
         };
 
         // OCR Recognition
-        let box_output = image_to_boxes(&tess_image, &args)?;
-        let mut chars: Vec<Char> = Vec::new();
-        for char in box_output.boxes {
-            chars.push(Char {
-                text: char.symbol,
-                top: char.top,
-                bottom: char.bottom,
-                left: char.left,
-                right: char.right,
-                center: (char.top + char.bottom) / 2
-            });
-        }
-
-        // Separate by lines
-        let lines = Ocr::chars_to_lines(chars);
-
-        // Separate & load items
-        for line in lines{
-            screenshot.append_items(Ocr::line_to_items(line, 1, Some(kind.clone())));
-        }
-
-        Ok(())
+        // TODO: lets go back to image_to_boxes() + sorting the chars
+        if let Ok(ocr) = image_to_string(&tess_image, &args) {
+            let ocr = ocr.trim_end();
+            println!("ocr={:?}", ocr);
+            Some(ocr.to_string())
+        } else { None }
+        
     }
 
 }

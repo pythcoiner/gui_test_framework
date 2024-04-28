@@ -6,6 +6,7 @@ use crate::error::Error;
 use crate::ScreenShot;
 use crate::graphical::Graphical;
 use crate::items::ItemMap;
+use crate::widget_detector::detect_items;
 
 #[allow(unused)]
 pub struct Capture{}
@@ -75,9 +76,15 @@ impl Capture {
             image: None,
             position: rect,
             items: Vec::new(),
-            item_map: Default::default(),
+            item_map: map,
         };
-        s.process(map)?;
-        Ok(s)
+        if let Ok(items) = detect_items(&s.item_map, &s.frame) {
+            s.items = items;
+            Ok(s)
+        } else {
+            println!("Fail to detect items!");
+            Err(Error::DetectItem)
+        }
+        
     }
 }

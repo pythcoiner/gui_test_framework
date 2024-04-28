@@ -71,9 +71,9 @@ impl Graphical for RgbaImage {
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 pub struct Color{
-    r: u8,
-    g: u8,
-    b: u8,
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
 }
 
 impl Color {
@@ -93,7 +93,7 @@ pub const ORANGE: Color = Color::new(0xff, 0xa7, 0x00);
 pub const MEDIUM_BLUE: Color = Color::new(0x00, 0x00, 0xcd);
 pub const DARK_CYAN: Color = Color::new(0x00, 0x8b, 0x8b);
 pub const LIME: Color = Color::new(0x00, 0xff, 0x00);
-pub const HOT_PINK: Color = Color::new(0xff, 0x69, 0xb4);
+pub const HOT_PINK: Color = Color::new(0, 220, 0);
 pub const PINK: Color = Color::new(0xff, 0xc0, 0xcb);
 #[allow(unused)]
 pub const WHEAT: Color = Color::new(0xf5, 0xde, 0xb3);

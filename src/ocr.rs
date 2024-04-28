@@ -39,7 +39,7 @@ impl Char {
 pub struct Ocr{}
 
 impl Ocr {
-    pub fn chars_to_lines(mut chars: Vec<Char>) -> Vec<Vec<Char>> {
+    fn chars_to_lines(mut chars: Vec<Char>) -> Vec<Vec<Char>> {
         // Sort chars by their vertical center position
         chars.sort_by(|a, b| a.center.partial_cmp(&b.center).unwrap());
 
@@ -64,13 +64,13 @@ impl Ocr {
         lines
     }
 
-    pub fn chars_are_on_same_line(a: &Char, b: &Char) -> bool {
+    fn chars_are_on_same_line(a: &Char, b: &Char) -> bool {
         // Check if the vertical center of one char is within the vertical range of the other
         (b.center <= a.top  && b.center >= a.bottom) ||
             (a.center <= b.top && a.center >= b.bottom)
     }
 
-    pub fn line_to_items(chars: Vec<Char>, factor: i32, kind: Option<ItemKind>) -> Vec<Item> {
+    fn line_to_items(chars: Vec<Char>, factor: i32, kind: Option<ItemKind>) -> Vec<Item> {
         let mut words: Vec<Item> = Vec::new();
         let mut current_word_chars: Vec<Char> = Vec::new();
 
@@ -90,7 +90,7 @@ impl Ocr {
         words
     }
 
-    pub fn chars_to_item(chars: Vec<Char>, kind: Option<ItemKind>) -> Item {
+    fn chars_to_item(chars: Vec<Char>, kind: Option<ItemKind>) -> Item {
         let mut text = String::new();
         let mut left = i32::MAX;
         let mut right = i32::MIN;

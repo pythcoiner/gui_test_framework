@@ -3,8 +3,8 @@ mod capture;
 mod graphical;
 mod error;
 mod items;
+mod widget_detector;
 
-use std::fmt::format;
 use autopilot::geometry::{Rect};
 
 use rusty_tesseract::image::{Rgba, RgbaImage};
@@ -19,6 +19,7 @@ use crate::ocr::Ocr;
 
 
 #[derive(Debug)]
+#[allow(unused)]
 struct ScreenShot {
     pub frame: RgbaImage,
     pub image: Option<RgbaImage>,
@@ -43,6 +44,7 @@ impl ScreenShot {
         self.items.push(item);
     }
 
+    #[allow(unused)]
     fn draw_item_box(&mut self, rect: &Rect, b: u32, color: Rgba<u8>) {
         let h = self.position.size.height as u32;
         if let Some(img) = &mut self.image {

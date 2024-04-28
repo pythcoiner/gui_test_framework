@@ -2,6 +2,8 @@ use std::collections::HashMap;
 use autopilot::geometry::Rect;
 use crate::graphical::Color;
 
+pub type ItemMap = HashMap<Color, ItemKind>;
+
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum ItemKind {
     TextInput,
@@ -20,4 +22,3 @@ pub struct Item {
     pub kind: Option<ItemKind>,
 }
 
-pub type ItemMap = HashMap<Color, ItemKind>;

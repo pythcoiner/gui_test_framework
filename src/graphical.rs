@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use autopilot::bitmap::Bitmap;
 use autopilot::geometry::Point;
 use rusty_tesseract::image::{Rgba, RgbaImage};
@@ -49,6 +48,8 @@ impl Graphical for RgbaImage {
         
         fn color_match(this: Rgba<u8>, other: Rgba<u8>) -> bool{
             let trigger = 80i16;
+            
+            #[allow(clippy::if_same_then_else, clippy::needless_bool)]
             if (this.0[0] as i16 - other.0[0] as i16).abs() > trigger {false}
             else if (this.0[1] as i16 - other.0[1] as i16).abs() > trigger {false}
             else if (this.0[2] as i16 - other.0[2] as i16).abs() > trigger {false}
@@ -81,9 +82,9 @@ impl Color {
     }
 }
 
-impl Into<Rgba<u8>> for Color {
-    fn into(self) -> Rgba<u8> {
-        Rgba([self.r, self.g, self.b, 255])
+impl From<Color> for Rgba<u8> {
+    fn from(value: Color) -> Self {
+        Rgba([value.r, value.g, value.b, 255])
     }
 }
 
@@ -94,6 +95,7 @@ pub const DARK_CYAN: Color = Color::new(0x00, 0x8b, 0x8b);
 pub const LIME: Color = Color::new(0x00, 0xff, 0x00);
 pub const HOT_PINK: Color = Color::new(0xff, 0x69, 0xb4);
 pub const PINK: Color = Color::new(0xff, 0xc0, 0xcb);
+#[allow(unused)]
 pub const WHEAT: Color = Color::new(0xf5, 0xde, 0xb3);
 pub const PURPLE: Color = Color::new(0x80, 0x00, 0x80);
 pub const CORAL: Color = Color::new(0xff, 0x7f, 0x50);

@@ -4,8 +4,9 @@ use crate::items::ItemMap;
 #[derive(Debug, Clone)]
 struct WidgetDetector {}
 
+#[allow(unused)]
 impl WidgetDetector {
-    pub fn find(map: ItemMap) {
+    pub fn find(_map: ItemMap) {
 
     }
 }

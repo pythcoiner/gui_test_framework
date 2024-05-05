@@ -5,7 +5,7 @@ pub enum Error {
     FailFindWindow(String),
     FailFetchPosition,
     FailCapture(String),
-    Tesseract(TessError),
+    FailOCR,
 }
 
 impl From<TessError> for Error {

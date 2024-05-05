@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use autopilot::bitmap::Bitmap;
 use autopilot::geometry::Point;
 use rusty_tesseract::image::{Rgba, RgbaImage};
@@ -49,10 +48,10 @@ impl Graphical for RgbaImage {
         
         fn color_match(this: Rgba<u8>, other: Rgba<u8>) -> bool{
             let trigger = 80i16;
+            #[allow(clippy::if_same_then_else)]
             if (this.0[0] as i16 - other.0[0] as i16).abs() > trigger {false}
             else if (this.0[1] as i16 - other.0[1] as i16).abs() > trigger {false}
-            else if (this.0[2] as i16 - other.0[2] as i16).abs() > trigger {false}
-            else {true}
+            else { (this.0[2] as i16 - other.0[2] as i16).abs() <= trigger }
         }
         
         let mut image = self.clone();

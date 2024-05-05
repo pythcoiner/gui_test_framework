@@ -4,10 +4,10 @@ mod graphical;
 mod error;
 mod items;
 
-use std::fmt::format;
+mod 
+
 use autopilot::geometry::{Rect};
 
-use rusty_tesseract::image::{Rgba, RgbaImage};
 
 use graphical::Graphical;
 use error::Error;

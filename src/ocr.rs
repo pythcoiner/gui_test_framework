@@ -1,3 +1,4 @@
+use std::fmt::format;
 use std::fs;
 use std::path::PathBuf;
 use image::{GenericImageView, RgbaImage};
@@ -20,14 +21,15 @@ pub struct Ocr{}
 impl Ocr {
     pub fn build_engine() -> OcrEngine {
         // Use the `download-models.sh` script to download the models.
-        // let detection_model_data = include_bytes!("ocrs/text-detection.rten");
+        let detection_model_data = read_file("ocrs/text-detection.rten").unwrap();
         let rec_model_data = read_file("ocrs/text-recognition.rten").unwrap();
 
-        // let detection_model = Model::load(detection_model_data).unwrap();
+        let detection_model = Model::load(&detection_model_data).unwrap();
         let recognition_model = Model::load(&rec_model_data).unwrap();
 
         OcrEngine::new(OcrEngineParams {
             recognition_model: Some(recognition_model),
+            detection_model: Some(detection_model),
             ..Default::default()
         }).unwrap()
     }
@@ -41,14 +43,39 @@ impl Ocr {
             position.width,
             position.height)
             .to_image();
+        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        path.push("cropped");
+        path.push(format!("{}_{}.png", position.x, position.y));
+        cropped.save(path).unwrap();
 
         // FIXME: engine should be created only once and passed as argument
         let engine = Self::build_engine();
 
-        let img_source = ImageSource::from_bytes(&cropped, frame.dimensions()).unwrap();
+        let img_source = ImageSource::from_bytes(&cropped, cropped.dimensions()).unwrap();
         let ocr_input = engine.prepare_input(img_source).unwrap();
 
-        if let Ok(txt) = engine.get_text(&ocr_input) {
+        let word_rects = engine.detect_words(&ocr_input).unwrap();
+        let line_rects = engine.find_text_lines(&ocr_input, &word_rects);
+        let line_texts = engine.recognize_text(&ocr_input, &line_rects).unwrap();
+
+        let lines: Vec<_> =  line_texts
+            .into_iter()
+            .flatten()
+            // Filter likely spurious detections. With future model improvements
+            // this should become unnecessary.
+            .filter_map(|l| {
+                let s = l.to_string();
+                if s.len() > 0 {
+                    Some(s)
+                } else {
+                    None
+                }
+            })
+            .collect();            
+
+        
+        if !lines.is_empty() {
+            let txt = lines[0].clone();
             println!("{}", txt);
             Some(txt)
         } else {

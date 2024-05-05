@@ -47,18 +47,16 @@ impl Ocr {
         // FIXME: engine should be created only once and passed as argument
         let engine = Self::build_engine();
 
-        let img_source = ImageSource::from_bytes(&frame, frame.dimensions()).unwrap();
+        let img_source = ImageSource::from_bytes(&cropped, frame.dimensions()).unwrap();
         let ocr_input = engine.prepare_input(img_source).unwrap();
 
         if let Ok(txt) = engine.get_text(&ocr_input) {
+            println!("{}", txt);
             Some(txt)
         } else {
+            println!("OCR failed!");
             None
         }
-
-
-
     }
-
 }
 

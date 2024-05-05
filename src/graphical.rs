@@ -1,4 +1,5 @@
 use autopilot::bitmap::Bitmap;
+use autopilot::geometry::Point;
 use image::{Rgba, RgbaImage};
 use crate::Error;
 
@@ -13,8 +14,12 @@ impl Graphical for RgbaImage {
     fn from_bitmap(bitmap: &Bitmap) -> Result<Box<Self>, Error> {
 
         let (width, height) = (bitmap.size.width as u32, bitmap.size.height as u32);
-        let imgbuf = RgbaImage::new(width, height);
-
+        let mut imgbuf = RgbaImage::new(width, height);
+        for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
+            let pos = Point::new(x as f64, y as f64);
+            let o_pixel = bitmap.get_pixel(pos);
+            *pixel = Rgba([o_pixel.0[0], o_pixel.0[1], o_pixel.0[2], o_pixel.0[3]])
+        }
         Ok(Box::new(imgbuf))
     }
 

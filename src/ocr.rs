@@ -1,6 +1,3 @@
-use crate::error::Error;
-use crate::items::{Item, ItemKind};
-use crate::ScreenShot;
 use std::fs;
 use std::path::PathBuf;
 use image::{GenericImageView, RgbaImage};
@@ -13,6 +10,7 @@ use crate::widget_detector::Position;
 fn read_file(path: &str) -> Result<Vec<u8>, std::io::Error> {
     let mut abs_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     abs_path.push(path);
+    println!("path={:?}", abs_path);
     fs::read(abs_path)
 }
 

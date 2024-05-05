@@ -107,7 +107,6 @@ fn main() -> Result<(), Error> {
     item_map.insert(PINK, MenuButton(true));
     item_map.insert(CORAL, CheckBox);
     item_map.insert(DARK_CYAN, SettingSection);
-    
     let page = Capture::from_named_window("Liana", item_map)?;
     page.print_items();
 

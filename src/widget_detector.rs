@@ -59,10 +59,10 @@ fn detect(colors: &str, path: &Path) -> Result<String, DetectError> {
 
 #[allow(unused)]
 pub fn detect_items(map: &ItemMap, frame: &RgbaImage) -> Result<Vec<Item>, DetectError> {
-    
+    println!("detect_items");
     // get current dir
     let mut dir = std::env::current_dir()
-        .expect("Should no fait getting cwd!");
+        .expect("Should no fail getting cwd!");
     dir.push("frame.png");
     
     // save frame in temp `frame.png` file
@@ -74,6 +74,8 @@ pub fn detect_items(map: &ItemMap, frame: &RgbaImage) -> Result<Vec<Item>, Detec
 
     let out: Response = serde_json::from_str(&r)
         .map_err(|_| DetectError::ParseResponse)?;
+    
+    println!("{:?}", out);
 
     if out.status != *"OK" {
         return Err(DetectError::ExecuteDw);
@@ -81,9 +83,10 @@ pub fn detect_items(map: &ItemMap, frame: &RgbaImage) -> Result<Vec<Item>, Detec
     
     let items = out.items.unwrap();
     
-
     
-    items.iter().for_each(|i| println!("{:?}", i));
+    for item in items.clone() {
+        println!("{:?}", item);
+    }
     
     let items = items
         .into_iter()

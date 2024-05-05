@@ -6,8 +6,8 @@ mod items;
 mod widget_detector;
 
 use autopilot::geometry::{Rect};
+use image::{Rgba, RgbaImage};
 
-use rusty_tesseract::image::{Rgba, RgbaImage};
 
 use graphical::Graphical;
 use error::Error;

@@ -4,7 +4,7 @@ use autopilot::geometry::{Point};
 use serde::{Deserialize, Serialize};
 use crate::graphical::Color;
 use crate::items::{Item, ItemMap};
-use rusty_tesseract::image::RgbaImage;
+use image::RgbaImage;
 use crate::ocr::Ocr;
 
 #[derive(Debug, Clone, Copy)]

@@ -1,4 +1,4 @@
-use rusty_tesseract::TessError;
+
 
 #[derive(Debug)]
 pub enum Error {
@@ -6,12 +6,5 @@ pub enum Error {
     FailFetchPosition,
     FailCapture(String),
     #[allow(unused)]
-    Tesseract(TessError),
     DetectItem,
-}
-
-impl From<TessError> for Error {
-    fn from(err: TessError) -> Self {
-        Error::Tesseract(err)
-    }
 }

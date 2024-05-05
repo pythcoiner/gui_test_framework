@@ -7,10 +7,13 @@ edition = "2021"
 
 [dependencies]
 autopilot = "0.4.0"
-rusty-tesseract = "1.1.9"
+
 x11 = "2.21.0"
-image = "0.22.5"
-ocrs = "0.5.0"
 serde = {version = "1.0.171", features = ["derive"]}
 serde_json = "1.0.116"
 imageproc = "0.24.0"
+image = { version = "0.25.1", default-features = false, features = ["png", "jpeg", "webp"] }
+ocrs = {git = "https://github.com/robertknight/ocrs", rev = "ea67c9e70adf834e8a8632e50845b51fb38b1bc7"}
+rten = "0.8.0"
+rten-tensor = "0.8.0"
+lexopt = "0.3.0"

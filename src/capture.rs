@@ -1,7 +1,7 @@
 use std::process::Command;
 use std::str;
 use autopilot::geometry::{Point, Rect, Size};
-use rusty_tesseract::image::RgbaImage;
+use image::RgbaImage;
 use crate::error::Error;
 use crate::ScreenShot;
 use crate::graphical::Graphical;

@@ -9,8 +9,6 @@ mod screenshot;
 mod store;
 mod widget_detector;
 
-use std::collections::HashMap;
-
 use crate::capture::Capture;
 use crate::graphical::Color;
 use crate::graphical::{CORAL, DARK_CYAN, HOT_PINK, LIME, MEDIUM_BLUE, ORANGE, PINK, PURPLE, RED};
@@ -20,6 +18,7 @@ use crate::liana_item::LianaItemType::{
 use error::Error;
 use liana_item::LianaItemType;
 use screenshot::ScreenShot;
+use std::collections::HashMap;
 
 fn screenshot() -> Result<ScreenShot, Error> {
     let mut item_map: HashMap<Color, LianaItemType> = HashMap::new();

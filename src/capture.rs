@@ -67,6 +67,7 @@ impl Capture {
                 Err(Error::FailFetchPosition)
             }
         } else {
+            println!("find_named_window() failed!");
             Err(Error::FailFindWindow(window_name.to_string()))
         }
     }

@@ -1,10 +1,13 @@
 use crate::error::Error;
 use crate::graphical::Graphical;
-use crate::items::ItemMap;
-use crate::screenshot::ScreenShot;
+use crate::liana_item::LianaItemType;
+use crate::liana_store::LianaStore;
+use crate::screenshot::{ScreenShot, ScreenShotTrait};
 use crate::widget_detector::detect_items;
+use crate::Color;
 use autopilot::geometry::{Point, Rect, Size};
 use image::RgbaImage;
+use std::collections::HashMap;
 use std::process::Command;
 use std::str;
 
@@ -68,7 +71,10 @@ impl Capture {
         }
     }
 
-    pub fn from_named_window(window_name: &str, map: ItemMap) -> Result<ScreenShot, Error> {
+    pub fn from_named_window(
+        window_name: &str,
+        map: HashMap<Color, LianaItemType>,
+    ) -> Result<ScreenShot, Error> {
         let rect = Self::find_named_window(window_name)?;
         let frame = autopilot::bitmap::capture_screen_portion(rect)
             .map_err(|e| Error::FailCapture(e.to_string()))?;
@@ -77,11 +83,11 @@ impl Capture {
             frame,
             image: None,
             position: rect,
-            items: Vec::new(),
             item_map: map,
+            store: LianaStore::new(),
         };
         if let Ok(items) = detect_items(&s.item_map, &s.frame) {
-            s.items = items;
+            s.append_items(items);
             Ok(s)
         } else {
             println!("Fail to detect items!");

@@ -1,9 +1,11 @@
 use crate::graphical::Color;
-use crate::items::{Item, ItemMap};
+use crate::liana_item::{LianaItem as Item, LianaItemType};
+type ItemMap = HashMap<Color, LianaItemType>;
 use crate::ocr::Ocr;
 use autopilot::geometry::Point;
 use image::RgbaImage;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::path::Path;
 use std::process::{Command, Stdio};
 
@@ -194,7 +196,7 @@ struct Response {
 mod test {
     use super::*;
     use crate::graphical::Color;
-    use crate::items::ItemKind;
+    use crate::liana_item::LianaItemType as ItemKind;
     use std::collections::HashMap;
     use std::path::Path;
     #[test]

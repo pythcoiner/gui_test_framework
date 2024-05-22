@@ -1,0 +1,82 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/pyth/gui_test_framework/image_processing/include",
+      "-isystem",
+      "/usr/include/opencv4",
+      "-std=gnu++17",
+      "-c",
+      "-o",
+      "CMakeFiles/image_processing.dir/main.cpp.o",
+      "/home/pyth/gui_test_framework/image_processing/main.cpp"
+    ],
+    "directory": "/home/pyth/gui_test_framework/image_processing/build",
+    "file": "/home/pyth/gui_test_framework/image_processing/main.cpp",
+    "output": "/home/pyth/gui_test_framework/image_processing/build/CMakeFiles/image_processing.dir/main.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/pyth/gui_test_framework/image_processing/include",
+      "-isystem",
+      "/usr/include/opencv4",
+      "-std=gnu++17",
+      "-c",
+      "-o",
+      "CMakeFiles/image_processing.dir/src/request.cpp.o",
+      "/home/pyth/gui_test_framework/image_processing/src/request.cpp"
+    ],
+    "directory": "/home/pyth/gui_test_framework/image_processing/build",
+    "file": "/home/pyth/gui_test_framework/image_processing/src/request.cpp",
+    "output": "/home/pyth/gui_test_framework/image_processing/build/CMakeFiles/image_processing.dir/src/request.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/pyth/gui_test_framework/image_processing/include",
+      "-isystem",
+      "/usr/include/opencv4",
+      "-std=gnu++17",
+      "-c",
+      "-o",
+      "CMakeFiles/image_processing.dir/src/response.cpp.o",
+      "/home/pyth/gui_test_framework/image_processing/src/response.cpp"
+    ],
+    "directory": "/home/pyth/gui_test_framework/image_processing/build",
+    "file": "/home/pyth/gui_test_framework/image_processing/src/response.cpp",
+    "output": "/home/pyth/gui_test_framework/image_processing/build/CMakeFiles/image_processing.dir/src/response.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/pyth/gui_test_framework/image_processing/include",
+      "-isystem",
+      "/usr/include/opencv4",
+      "-std=gnu++17",
+      "-c",
+      "-o",
+      "CMakeFiles/image_processing.dir/src/item.cpp.o",
+      "/home/pyth/gui_test_framework/image_processing/src/item.cpp"
+    ],
+    "directory": "/home/pyth/gui_test_framework/image_processing/build",
+    "file": "/home/pyth/gui_test_framework/image_processing/src/item.cpp",
+    "output": "/home/pyth/gui_test_framework/image_processing/build/CMakeFiles/image_processing.dir/src/item.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/pyth/gui_test_framework/image_processing/include",
+      "-isystem",
+      "/usr/include/opencv4",
+      "-std=gnu++17",
+      "-c",
+      "-o",
+      "CMakeFiles/image_processing.dir/src/args.cpp.o",
+      "/home/pyth/gui_test_framework/image_processing/src/args.cpp"
+    ],
+    "directory": "/home/pyth/gui_test_framework/image_processing/build",
+    "file": "/home/pyth/gui_test_framework/image_processing/src/args.cpp",
+    "output": "/home/pyth/gui_test_framework/image_processing/build/CMakeFiles/image_processing.dir/src/args.cpp.o"
+  }
+]

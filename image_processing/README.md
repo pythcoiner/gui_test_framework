@@ -1,11 +1,18 @@
 ## dependencies
 
+Arch:
+
 ``` 
 sudo pacman -S opencv
 sudo pacman -S opencv-contrib
 sudo pacman -S hdf5 arpack superlu
 sudo pacman -S blas lapack
 
+```
+Debian:
+
+``` 
+sudo apt install libopencv-dev libopencv-contriv-dev libhdf5-dev libarpack2-dev libsuperlu-dev libblas-dev liblapack-dev
 ```
 
 ## build

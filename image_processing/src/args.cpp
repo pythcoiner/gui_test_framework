@@ -26,6 +26,11 @@ bool Args::parse(int argc, char *argv[]) {
 
     nlohmann::json json = nlohmann::json::parse(json_colors);
 
+    if (!json.contains("filename")) {
+        std::cout << "File arg is missing!";
+        return false;
+    }
+
     if (!json.contains("colors")) {
         std::cout << "Colors key missing in json data!" << std::endl;
         return false;

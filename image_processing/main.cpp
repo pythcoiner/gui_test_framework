@@ -141,8 +141,7 @@ std::vector<cv::Rect> find_items(cv::Mat* mask, bool debug) {
         cv::approxPolyDP(contours[i], contours_poly, 3, true);
 
         // Get the bounding rectangle
-        items[i] = cv::boundingclear
-        Rect(contours_poly);
+        items[i] = cv::boundingRect(contours_poly);
     }
 
     if (debug) {

@@ -1,15 +1,15 @@
-use std::process::Command;
-use std::str;
-use autopilot::geometry::{Point, Rect, Size};
-use image::RgbaImage;
 use crate::error::Error;
-use crate::ScreenShot;
 use crate::graphical::Graphical;
 use crate::items::ItemMap;
 use crate::widget_detector::detect_items;
+use crate::ScreenShot;
+use autopilot::geometry::{Point, Rect, Size};
+use image::RgbaImage;
+use std::process::Command;
+use std::str;
 
 #[allow(unused)]
-pub struct Capture{}
+pub struct Capture {}
 
 impl Capture {
     pub fn get_window_position(output: &str) -> Result<Rect, Error> {
@@ -54,7 +54,8 @@ impl Capture {
     pub fn find_named_window(window_name: &str) -> Result<Rect, Error> {
         let output = Command::new("xwininfo")
             .args(["-name", window_name])
-            .output().map_err(|_| Error::FailFindWindow(window_name.to_string()))?;
+            .output()
+            .map_err(|_| Error::FailFindWindow(window_name.to_string()))?;
 
         if output.status.success() {
             if let Ok(str_out) = str::from_utf8(&output.stdout) {
@@ -69,7 +70,8 @@ impl Capture {
 
     pub fn from_named_window(window_name: &str, map: ItemMap) -> Result<ScreenShot, Error> {
         let rect = Self::find_named_window(window_name)?;
-        let frame = autopilot::bitmap::capture_screen_portion(rect).map_err(|e| Error::FailCapture(e.to_string()))?;
+        let frame = autopilot::bitmap::capture_screen_portion(rect)
+            .map_err(|e| Error::FailCapture(e.to_string()))?;
         let frame = *RgbaImage::from_bitmap(&frame)?;
         let mut s = ScreenShot {
             frame,
@@ -85,6 +87,6 @@ impl Capture {
             println!("Fail to detect items!");
             Err(Error::DetectItem)
         }
-        
     }
 }
+

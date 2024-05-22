@@ -1,22 +1,22 @@
-use std::fmt::format;
-use std::fs;
-use std::path::PathBuf;
+use crate::widget_detector::Position;
 use image::{GenericImageView, RgbaImage};
 use ocrs::{ImageSource, OcrEngine, OcrEngineParams};
 use rten::Model;
 #[allow(unused)]
 use rten_tensor::prelude::*;
-use crate::widget_detector::Position;
+use std::fmt::format;
+use std::fs;
+use std::path::PathBuf;
 
 fn read_file(path: &str) -> Result<Vec<u8>, std::io::Error> {
     let mut abs_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     abs_path.push(path);
-    println!("path={:?}", abs_path);
+    // println!("path={:?}", abs_path);
     fs::read(abs_path)
 }
 
 #[allow(unused)]
-pub struct Ocr{}
+pub struct Ocr {}
 
 impl Ocr {
     pub fn build_engine() -> OcrEngine {
@@ -31,17 +31,13 @@ impl Ocr {
             recognition_model: Some(recognition_model),
             detection_model: Some(detection_model),
             ..Default::default()
-        }).unwrap()
+        })
+        .unwrap()
     }
 
-
     pub fn read_label(frame: &RgbaImage, position: &Position) -> Option<String> {
-
-        let cropped: RgbaImage = frame.view(
-            position.x,
-            position.y,
-            position.width,
-            position.height)
+        let cropped: RgbaImage = frame
+            .view(position.x, position.y, position.width, position.height)
             .to_image();
         let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         path.push("cropped");
@@ -58,7 +54,7 @@ impl Ocr {
         let line_rects = engine.find_text_lines(&ocr_input, &word_rects);
         let line_texts = engine.recognize_text(&ocr_input, &line_rects).unwrap();
 
-        let lines: Vec<_> =  line_texts
+        let lines: Vec<_> = line_texts
             .into_iter()
             .flatten()
             // Filter likely spurious detections. With future model improvements
@@ -71,9 +67,8 @@ impl Ocr {
                     None
                 }
             })
-            .collect();            
+            .collect();
 
-        
         if !lines.is_empty() {
             let txt = lines[0].clone();
             println!("{}", txt);
@@ -84,4 +79,3 @@ impl Ocr {
         }
     }
 }
-

@@ -4,7 +4,6 @@ use ocrs::{ImageSource, OcrEngine, OcrEngineParams};
 use rten::Model;
 #[allow(unused)]
 use rten_tensor::prelude::*;
-use std::fmt::format;
 use std::fs;
 use std::path::PathBuf;
 
@@ -61,7 +60,7 @@ impl Ocr {
             // this should become unnecessary.
             .filter_map(|l| {
                 let s = l.to_string();
-                if s.len() > 0 {
+                if !s.is_empty() {
                     Some(s)
                 } else {
                     None

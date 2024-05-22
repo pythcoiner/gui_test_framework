@@ -1,9 +1,9 @@
+use crate::Error;
 use autopilot::bitmap::Bitmap;
 use autopilot::geometry::Point;
 use image::{Rgba, RgbaImage};
-use crate::Error;
 
-
+#[allow(unused)]
 pub trait Graphical {
     fn from_bitmap(bitmap: &Bitmap) -> Result<Box<Self>, Error>;
     fn draw_rectangle(&mut self, xa: u32, xb: u32, ya: u32, yb: u32, color: Rgba<u8>);
@@ -12,7 +12,6 @@ pub trait Graphical {
 
 impl Graphical for RgbaImage {
     fn from_bitmap(bitmap: &Bitmap) -> Result<Box<Self>, Error> {
-
         let (width, height) = (bitmap.size.width as u32, bitmap.size.height as u32);
         let mut imgbuf = RgbaImage::new(width, height);
         for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
@@ -23,7 +22,14 @@ impl Graphical for RgbaImage {
         Ok(Box::new(imgbuf))
     }
 
-    fn draw_rectangle(&mut self, mut xa: u32, mut xb: u32, mut ya: u32, mut yb: u32, color: Rgba<u8>) {
+    fn draw_rectangle(
+        &mut self,
+        mut xa: u32,
+        mut xb: u32,
+        mut ya: u32,
+        mut yb: u32,
+        color: Rgba<u8>,
+    ) {
         // TODO: check boundaries
         if yb < ya {
             (ya, yb) = (yb, ya);
@@ -39,40 +45,43 @@ impl Graphical for RgbaImage {
     }
 
     fn filter_by_color(&self, color: Color) -> Self {
-        
-        fn color_match(this: Rgba<u8>, other: Rgba<u8>) -> bool{
+        fn color_match(this: Rgba<u8>, other: Rgba<u8>) -> bool {
             let trigger = 80i16;
-            
+
             #[allow(clippy::if_same_then_else, clippy::needless_bool)]
-            if (this.0[0] as i16 - other.0[0] as i16).abs() > trigger {false}
-            else if (this.0[1] as i16 - other.0[1] as i16).abs() > trigger {false}
-            else if (this.0[2] as i16 - other.0[2] as i16).abs() > trigger {false}
-            else {true}
+            if (this.0[0] as i16 - other.0[0] as i16).abs() > trigger {
+                false
+            } else if (this.0[1] as i16 - other.0[1] as i16).abs() > trigger {
+                false
+            } else if (this.0[2] as i16 - other.0[2] as i16).abs() > trigger {
+                false
+            } else {
+                true
+            }
         }
-        
+
         let mut image = self.clone();
-        image.enumerate_pixels_mut()
-            .for_each(|(_, _, pixel)| {
-                if !color_match(*pixel , color.into()) {
-                    *pixel = Rgba([255, 255, 255, 255]); // Set to white
-                } else {
-                    *pixel = Rgba([0, 0, 0, 255]); // Set to black
-                }
-            });
+        image.enumerate_pixels_mut().for_each(|(_, _, pixel)| {
+            if !color_match(*pixel, color.into()) {
+                *pixel = Rgba([255, 255, 255, 255]); // Set to white
+            } else {
+                *pixel = Rgba([0, 0, 0, 255]); // Set to black
+            }
+        });
         image
     }
 }
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
-pub struct Color{
+pub struct Color {
     pub r: u8,
     pub g: u8,
     pub b: u8,
 }
 
 impl Color {
-    const fn new(r: u8, g: u8, b: u8) ->  Self {
-        Color {r, g, b}
+    const fn new(r: u8, g: u8, b: u8) -> Self {
+        Color { r, g, b }
     }
 }
 

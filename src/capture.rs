@@ -1,8 +1,8 @@
 use crate::error::Error;
 use crate::graphical::Graphical;
 use crate::items::ItemMap;
+use crate::screenshot::ScreenShot;
 use crate::widget_detector::detect_items;
-use crate::ScreenShot;
 use autopilot::geometry::{Point, Rect, Size};
 use image::RgbaImage;
 use std::process::Command;
@@ -89,4 +89,3 @@ impl Capture {
         }
     }
 }
-

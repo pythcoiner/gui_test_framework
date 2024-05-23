@@ -30,4 +30,12 @@ impl Item<LianaItemType> for LianaItem {
     fn kind(&self) -> LianaItemType {
         self.kind
     }
+
+    fn set_name(&mut self, name: String) {
+        self.text = Some(name);
+    }
+
+    fn set_position(&mut self, position: Rect) {
+        self.position = position;
+    }
 }

@@ -42,27 +42,24 @@ fn main() -> Result<(), Error> {
     let mut screen = screenshot()?;
 
     let btn = screen.find("Send", LianaItemType::MenuButton(true));
-    btn.hover();
+    btn.click();
 
-    sleep(Duration::from_millis(300));
+    let mut screen = screenshot()?;
 
-    let btn = screen.find("Coins", LianaItemType::MenuButton(true));
-    btn.hover();
+    let text = screen.find("Address", LianaItemType::TextInput);
+    text.insert("bcrt1qyv9w4zx43kv96key52kwpkj3t9guwjflrz4vccftft02y4f0xtzqa65sfu");
 
-    sleep(Duration::from_millis(300));
+    let text = screen.find("Payment label", LianaItemType::TextInput);
+    text.insert("Maria paycheck");
 
-    let btn = screen.find("Home", LianaItemType::MenuButton(true));
-    btn.hover();
+    let text = screen.find("0.001 (in BTC)", LianaItemType::TextInput);
+    text.insert("0.1");
 
-    sleep(Duration::from_millis(300));
+    let text = screen.find("42 (in sats/vbyte)", LianaItemType::TextInput);
+    text.insert("10");
 
-    let btn = screen.find("Receive", LianaItemType::MenuButton(true));
-    btn.hover();
-
-    sleep(Duration::from_millis(300));
-
-    let btn = screen.find("PSBTs", LianaItemType::MenuButton(true));
-    btn.hover();
+    let btn = screen.find("Clear", LianaItemType::PrimaryButton(true));
+    btn.click();
 
     Ok(())
 }

@@ -54,10 +54,16 @@ where
 
     fn push(&mut self, mut item: I) {
         // Adjust item's position by adding the offset of the screenshot
-        item.position().origin.x = self.position().origin.x - item.position().origin.x;
-        item.position().origin.y = -(self.position().origin.y - item.position().origin.y);
-        item.position().size.height = -item.position().size.height;
+        let mut position = item.position();
+        position.origin.x = self.position().origin.x + item.position().origin.x;
+        position.origin.y = self.position().origin.y + item.position().origin.y;
+        position.size = item.position().size;
+
         let kind = item.kind();
+
+        item.set_position(position);
+        item.set_name(item.name().to_lowercase());
+
         // Append the adjusted item to the items vector
         self.store(kind).push(item);
     }
@@ -79,7 +85,9 @@ where
 
     fn find(&mut self, name: &str, kind: K) -> &mut I {
         let store = self.store(kind);
-        let item = store.iter_mut().find(|i| i.name() == name);
+        let item = store
+            .iter_mut()
+            .find(|i| i.name().to_lowercase() == name.to_lowercase());
         item.unwrap()
     }
 }

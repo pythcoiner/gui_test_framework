@@ -29,11 +29,11 @@ impl Store<LianaItem, LianaItemType> for LianaStore {
     fn bucket(&mut self, kind: LianaItemType) -> &mut Vec<LianaItem> {
         match kind {
             LianaItemType::TextInput => &mut self.text_inputs,
-            LianaItemType::PrimaryButton(_) => todo!(),
-            LianaItemType::SecondaryButton(_) => todo!(),
-            LianaItemType::MenuButton(_) => todo!(),
-            LianaItemType::CheckBox => todo!(),
-            LianaItemType::SettingSection => todo!(),
+            LianaItemType::PrimaryButton(_) => &mut self.primary_buttons,
+            LianaItemType::SecondaryButton(_) => &mut self.secondary_buttons,
+            LianaItemType::MenuButton(_) => &mut self.menu_buttons,
+            LianaItemType::CheckBox => &mut self.checkboxes,
+            LianaItemType::SettingSection => &mut self.setting_section,
         }
     }
 }

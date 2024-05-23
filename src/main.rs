@@ -17,7 +17,7 @@ use crate::liana_item::LianaItemType::{
 };
 use error::Error;
 use item::Item;
-use liana_item::{LianaItem, LianaItemType};
+use liana_item::LianaItemType;
 use screenshot::{ScreenShot, ScreenShotTrait};
 use std::collections::HashMap;
 use std::thread::sleep;
@@ -41,37 +41,27 @@ fn screenshot() -> Result<ScreenShot, Error> {
 fn main() -> Result<(), Error> {
     let mut screen = screenshot()?;
 
-    let btn: &mut LianaItem = screen
-        .find("Send", LianaItemType::MenuButton(true))
-        .unwrap();
+    let btn = screen.find("Send", LianaItemType::MenuButton(true));
     btn.hover();
 
     sleep(Duration::from_millis(300));
 
-    let btn: &mut LianaItem = screen
-        .find("Coins", LianaItemType::MenuButton(true))
-        .unwrap();
+    let btn = screen.find("Coins", LianaItemType::MenuButton(true));
     btn.hover();
 
     sleep(Duration::from_millis(300));
 
-    let btn: &mut LianaItem = screen
-        .find("Home", LianaItemType::MenuButton(true))
-        .unwrap();
+    let btn = screen.find("Home", LianaItemType::MenuButton(true));
     btn.hover();
 
     sleep(Duration::from_millis(300));
 
-    let btn: &mut LianaItem = screen
-        .find("Receive", LianaItemType::MenuButton(true))
-        .unwrap();
+    let btn = screen.find("Receive", LianaItemType::MenuButton(true));
     btn.hover();
 
     sleep(Duration::from_millis(300));
 
-    let btn: &mut LianaItem = screen
-        .find("PSBTs", LianaItemType::MenuButton(true))
-        .unwrap();
+    let btn = screen.find("PSBTs", LianaItemType::MenuButton(true));
     btn.hover();
 
     Ok(())

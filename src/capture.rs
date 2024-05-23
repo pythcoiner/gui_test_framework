@@ -74,7 +74,7 @@ impl Capture {
 
     pub fn from_named_window(
         window_name: &str,
-        map: HashMap<Color, LianaItemType>,
+        map: &HashMap<Color, LianaItemType>,
     ) -> Result<ScreenShot, Error> {
         let rect = Self::find_named_window(window_name)?;
         let frame = autopilot::bitmap::capture_screen_portion(rect)
@@ -84,7 +84,7 @@ impl Capture {
             frame,
             image: None,
             position: rect,
-            item_map: map,
+            item_map: map.clone(),
             store: LianaStore::new(),
         };
         if let Ok(items) = detect_items(&s.item_map, &s.frame) {

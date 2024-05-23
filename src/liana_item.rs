@@ -1,5 +1,5 @@
 use crate::item::Item;
-use crate::widget_detector::Position;
+use autopilot::geometry::Rect;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum LianaItemType {
@@ -14,13 +14,13 @@ pub enum LianaItemType {
 #[derive(Debug, Clone)]
 pub struct LianaItem {
     pub text: Option<String>,
-    pub position: Position,
+    pub position: Rect,
     pub kind: LianaItemType,
 }
 
 impl Item<LianaItemType> for LianaItem {
-    fn position(&self) -> Position {
-        self.position.clone()
+    fn position(&self) -> Rect {
+        self.position
     }
 
     fn name(&self) -> String {

@@ -49,11 +49,11 @@ where
         }
     }
 
-    fn push(&mut self, item: I) {
+    fn push(&mut self, mut item: I) {
         // Adjust item's position by adding the offset of the screenshot
-        // item.position.origin.x = self.position.origin.x - item.position.origin.x;
-        // item.position.origin.y = -(self.position.origin.y - item.position.origin.y);
-        // item.position.size.height = - item.position.size.height;
+        item.position().origin.x = self.position().origin.x - item.position().origin.x;
+        item.position().origin.y = -(self.position().origin.y - item.position().origin.y);
+        item.position().size.height = -item.position().size.height;
 
         // Append the adjusted item to the items vector
         self.store().push(item);
@@ -72,5 +72,11 @@ where
             img.draw_rectangle(xa - b, xa, ya, yb, color);
             img.draw_rectangle(xb, xb + b, ya, yb, color);
         }
+    }
+
+    fn find(&mut self, name: &str, kind: K) -> Option<&mut I> {
+        let store = self.store();
+        let item = store.iter_mut().find(|i| i.name() == name);
+        item
     }
 }

@@ -2,7 +2,7 @@ use crate::graphical::Color;
 use crate::liana_item::{LianaItem as Item, LianaItemType};
 type ItemMap = HashMap<Color, LianaItemType>;
 use crate::ocr::Ocr;
-use autopilot::geometry::Point;
+use autopilot::geometry::{Point, Rect, Size};
 use image::RgbaImage;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -94,7 +94,17 @@ pub fn detect_items(map: &ItemMap, frame: &RgbaImage) -> Result<Vec<Item>, Detec
         .filter_map(|item| {
             let color = item.color();
             let position = item.position();
-            if let (Some(color), Some(position)) = (color, position) {
+            if let (Some(color), Some(pos)) = (color, position) {
+                let position = Rect {
+                    origin: Point {
+                        x: pos.x as f64,
+                        y: pos.y as f64,
+                    },
+                    size: Size {
+                        width: pos.width as f64,
+                        height: pos.height as f64,
+                    },
+                };
                 map.get(&color).map(|kind| Item {
                     text: None,
                     position,

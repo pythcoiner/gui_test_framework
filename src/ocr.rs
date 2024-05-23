@@ -1,4 +1,3 @@
-use crate::widget_detector::Position;
 use image::{GenericImageView, RgbaImage};
 use ocrs::{ImageSource, OcrEngine, OcrEngineParams};
 use rten::Model;
@@ -34,13 +33,18 @@ impl Ocr {
         .unwrap()
     }
 
-    pub fn read_label(frame: &RgbaImage, position: &Position) -> Option<String> {
+    pub fn read_label(frame: &RgbaImage, position: &autopilot::geometry::Rect) -> Option<String> {
         let cropped: RgbaImage = frame
-            .view(position.x, position.y, position.width, position.height)
+            .view(
+                position.origin.x as u32,
+                position.origin.y as u32,
+                position.size.width as u32,
+                position.size.height as u32,
+            )
             .to_image();
         let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         path.push("cropped");
-        path.push(format!("{}_{}.png", position.x, position.y));
+        path.push(format!("{}_{}.png", position.origin.x, position.origin.y));
         cropped.save(path).unwrap();
 
         // FIXME: engine should be created only once and passed as argument

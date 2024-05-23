@@ -1,14 +1,14 @@
-use crate::widget_detector::Position;
+use autopilot::geometry::Rect;
 
 #[allow(unused)]
 fn click_mouse() {
     autopilot::mouse::click(autopilot::mouse::Button::Left, None);
 }
 #[allow(unused)]
-fn move_mouse(pos: Position) {
+fn move_mouse(pos: Rect) {
     autopilot::mouse::move_to(autopilot::geometry::Point {
-        x: pos.x as f64,
-        y: pos.y as f64,
+        x: (pos.origin.x + pos.size.width / 2.0),
+        y: (pos.origin.y + pos.size.height / 2.0),
     })
     .unwrap();
 }
@@ -19,7 +19,7 @@ fn input_text(text: String) {
 #[allow(unused)]
 pub trait Item<K> {
     // To be reimplemented
-    fn position(&self) -> Position;
+    fn position(&self) -> Rect;
     fn name(&self) -> String;
     fn kind(&self) -> K;
 
